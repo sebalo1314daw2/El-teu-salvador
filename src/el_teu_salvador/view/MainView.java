@@ -1,12 +1,25 @@
 package el_teu_salvador.view;
 
 import el_teu_salvador.control.Controller;
+import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
+import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -161,5 +174,33 @@ public class MainView extends JFrame {
     public void changeView(JPanel view) {
         this.setContentPane(view);
         this.validate();
+    }
+    /**
+     * obtainImageComponent()
+     * This function obtains the image component from the specified contact
+     * @author Sergio Baena Lopez
+     * @version 1.0
+     * @throws FileNotFoundException if the image file wasn't found
+     * @param Contact contact the contact whose image component we want to obtain
+     * @return ImageComponent the image component
+     */
+    public static ImageComponent obtainImageComponent(Contact contact) throws FileNotFoundException {
+        File source;
+        if(contact.getPhoto() == null) { // This contact doesn't have photo
+            source = new File (
+                ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
+            );
+        } else { // This contact has photo
+            source = new File (
+                ImageFile.CONTAINER_DIRECTORY_PATH  +
+                contact.getName()                   +
+                "."                                 + 
+                contact.getPhoto().getType()
+            );
+        }
+        if( !source.exists() ) {
+            throw new FileNotFoundException("The file image " + source + " wasn't found");
+        } // The file image was found
+        return new ImageComponent(source);
     }
 }

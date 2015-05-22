@@ -10,7 +10,8 @@ import sun.misc.BASE64Decoder;
 
 public class ImageFile {
     // ================================ Attributes =====================================================
-    private static final String CONTAINER_DIRECTORY_PATH = "img/";
+    public static final String CONTAINER_DIRECTORY_PATH = "img/";
+    public static final String DEFAULT_IMAGE_PATH = "user-without-photo.PNG";
     // ================================ Static methods =====================================================
     /**
      * generate()
