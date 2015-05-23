@@ -9,6 +9,7 @@ import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.MainView;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.swing.JCheckBox;
@@ -17,9 +18,11 @@ public class Controller {
     // ================================ Attributes =====================================================
     private MainView mainView;
     private List<Contact> contactList;
+    private List<Contact> selectedContactList;
     // ================================ Constructors =====================================================
     public Controller() {
         initViews();
+        selectedContactList = new ArrayList<Contact>();
     }
     // ================================ Methods =====================================================
     /**
@@ -55,10 +58,23 @@ public class Controller {
             e.printStackTrace();
         }
     }
-
+    /**
+     * modifySelectedContactList()
+     * This procedure modifies the list of selected contacts. If the user checks a checkbox, we'll
+     * add the specified contact to the list. In the opposite case, if the user unchecks a checkbox,
+     * we'll remove the specified contact of the list
+     * @author Sergio Baena Lopez
+     * @version 2.0
+     * @param JCheckBox aCheckbox the checkbox which was modified
+     * @param Contact aContact the contact whose checkbox had associated
+     */
     public void modifySelectedContactList(JCheckBox aCheckbox, Contact aContact) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if( aCheckbox.isSelected() ) { // the modified checkbox was checked
+            selectedContactList.add(aContact);
+        } else { // the modified checkbox was unchecked
+            selectedContactList.remove(aContact);
+        }
+        System.out.println(selectedContactList);
+        System.out.println( selectedContactList.size() );
     }
-
-    
 }

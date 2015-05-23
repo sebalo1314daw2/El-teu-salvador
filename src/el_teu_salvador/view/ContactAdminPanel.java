@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -17,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class ContactAdminPanel extends JPanel {
     // =============================== Attributes ======================================================
@@ -98,14 +102,12 @@ public class ContactAdminPanel extends JPanel {
             // Setting a checkbox
             final JCheckBox aCheckbox = new JCheckBox();
             aCheckbox.setPreferredSize( new Dimension(11, 11) );
-//            aCheckbox.addChangeListener (
-//                new ChangeListener() {
-//                    @Override
-//                    public void stateChanged(ChangeEvent ce) {
-//                        controller.modifySelectedContactList(aCheckbox, aContact);
-//                    }                
-//                }
-//            );
+            aCheckbox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    controller.modifySelectedContactList(aCheckbox, aContact);
+                }
+            });
             table.add(aCheckbox);
             // Setting the photo
             table.add( MainView.obtainImageComponent(aContact) );
