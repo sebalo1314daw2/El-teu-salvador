@@ -79,6 +79,14 @@ public class ContactAdminPanel extends JPanel {
                 }
         );
         JButton clearButton = new JButton("Netejar selecció");
+        clearButton.addActionListener (
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        controller.deselectAllContacts();
+                    }
+                }
+        );
         buttonGroupContainer.add(addButton);
         buttonGroupContainer.add(editButton);
         buttonGroupContainer.add(deleteButton);
@@ -174,6 +182,17 @@ public class ContactAdminPanel extends JPanel {
        public void checkAll() {
            for(int i = 0; i < checkboxesList.size(); i++) {
                 checkboxesList.get(i).setSelected(true);
+           }           
+       }
+       /**
+        * uncheckAll()
+        * This procedure unchecks all the checkboxes
+        * @author Sergio Baena Lopez
+        * @version 2.2
+        */
+       public void uncheckAll() {
+           for(int i = 0; i < checkboxesList.size(); i++) {
+                checkboxesList.get(i).setSelected(false);
            }           
        }
     }

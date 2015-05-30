@@ -83,4 +83,14 @@ public class Controller {
         contactAdminPanel.checkAll();
         selectedContactList = new ArrayList<Contact>(contactList);
     }
+    /**
+     * deselectAllContacts()
+     * This procedure deselects all the contacts 
+     * @author Sergio Baena Lopez
+     * @version 2.2
+     */
+    public void deselectAllContacts() {
+        contactAdminPanel.uncheckAll();
+        selectedContactList.clear();
+    }
 }
