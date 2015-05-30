@@ -1,22 +1,19 @@
 package el_teu_salvador.control;
 
 import el_teu_salvador.model.Contact;
-import el_teu_salvador.model.exceptions.VCFCorruptedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
 import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.MainView;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import javax.swing.JCheckBox;
 
 public class Controller {
     // ================================ Attributes =====================================================
     private MainView mainView;
+    private ContactAdminPanel contactAdminPanel;
     private List<Contact> contactList;
     private List<Contact> selectedContactList;
     // ================================ Constructors =====================================================
@@ -48,7 +45,8 @@ public class Controller {
             if( vcf.validate() ) { // VCF is valid --> We read the VCF file
                 contactList = vcf.read();
                 ImageFile.generate(contactList);
-                mainView.changeView( new ContactAdminPanel(this, contactList) );
+                contactAdminPanel = new ContactAdminPanel(this, contactList);
+                mainView.changeView(contactAdminPanel);
             } else { // VCF isn't valid --> we show an error message
                 mainView.showErrorMsg(MainView.INVALID_VCF);
             }
@@ -74,7 +72,15 @@ public class Controller {
         } else { // the modified checkbox was unchecked
             selectedContactList.remove(aContact);
         }
-        System.out.println(selectedContactList);
-        System.out.println( selectedContactList.size() );
+    }
+    /**
+     * selectAllContacts()
+     * This procedure selects all the contacts 
+     * @author Sergio Baena Lopez
+     * @version 2.1
+     */
+    public void selectAllContacts() {
+        contactAdminPanel.checkAll();
+        selectedContactList = new ArrayList<Contact>(contactList);
     }
 }

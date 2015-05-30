@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,8 +27,10 @@ public class ContactAdminPanel extends JPanel {
     // =============================== Attributes ======================================================
     private Controller controller;
     private JScrollPane scrollTable;
+    private List<JCheckBox> checkboxesList;
     // ================================ Constructors =====================================================
     public ContactAdminPanel(Controller controller, List<Contact> contactList) throws IOException {
+        checkboxesList = new ArrayList<JCheckBox>();
         initComponents(contactList);
         this.controller = controller;
     }
@@ -67,6 +70,14 @@ public class ContactAdminPanel extends JPanel {
         JButton editButton = new JButton("Editar");
         JButton deleteButton = new JButton("Eliminar");
         JButton selectAllButton = new JButton("Seleccionar tot");
+        selectAllButton.addActionListener (
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        controller.selectAllContacts();
+                    }
+                }
+        );
         JButton clearButton = new JButton("Netejar selecció");
         buttonGroupContainer.add(addButton);
         buttonGroupContainer.add(editButton);
@@ -108,6 +119,7 @@ public class ContactAdminPanel extends JPanel {
                     controller.modifySelectedContactList(aCheckbox, aContact);
                 }
             });
+            checkboxesList.add(aCheckbox);        
             table.add(aCheckbox);
             // Setting the photo
             table.add( MainView.obtainImageComponent(aContact) );
@@ -152,6 +164,17 @@ public class ContactAdminPanel extends JPanel {
            } // We've already added all the phones to the builder
            builder.append("</html>");
            return new JLabel( builder.toString() );   
+       }
+       /**
+        * checkAll()
+        * This procedure checks all the checkboxes
+        * @author Sergio Baena Lopez
+        * @version 1.0
+        */
+       public void checkAll() {
+           for(int i = 0; i < checkboxesList.size(); i++) {
+                checkboxesList.get(i).setSelected(true);
+           }           
        }
     }
        
