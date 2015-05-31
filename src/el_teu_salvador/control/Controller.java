@@ -3,14 +3,13 @@ package el_teu_salvador.control;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
+import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
 import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.MainView;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JCheckBox;
 
 public class Controller {
@@ -121,14 +120,13 @@ public class Controller {
      * This procedure finds the read contacts in the total list of contacts and it'll set
      * the new partial list of contacts 
      * @author Sergio Baena Lopez
-     * @version 3.0
+     * @version 4.0
      */
     public void findContacts() {
         try {
             Contact readContact = contactAdminPanel.readSearchEngine();
             partialContactList = totalContactList.find(readContact);
-            selectedContactList.clear();
-            contactAdminPanel.generateTable(partialContactList);
+            updateContactTable();
         } catch(ContactNotFoundException e) {
             mainView.showErrorMsg(ContactAdminPanel.CONTACT_NOT_FOUND_MSG);
         } catch(Exception e) {
@@ -139,15 +137,44 @@ public class Controller {
      * listAllContacts()
      * This procedure lists all the contacts
      * @author Sergio Baena Lopez
-     * @version 3.0
+     * @version 4.0
      */
     public void listAllContacts() {
         try {
             partialContactList = new ContactList(totalContactList);
-            selectedContactList.clear();
-            contactAdminPanel.generateTable(partialContactList);
+            updateContactTable();
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    /**
+     * removeContacts()
+     * This procedure removes all the selected contacts
+     * @author Sergio Baena Lopez
+     * @version 4.0
+     */
+    public void removeContacts() {
+        try {
+            partialContactList.remove(selectedContactList);
+            totalContactList.remove(selectedContactList);
+            
+            updateContactTable();
+            
+            mainView.showSuccessMsg(ContactAdminPanel.SUCCESSFUL_REMOVING_MSG);
+        } catch(NoContactSpecifiedException e) {
+            mainView.showErrorMsg(ContactAdminPanel.NO_CONTACT_SELECTED_MSG);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * updateContactTable()
+     * This procedure updates the contact table
+     * @author Sergio Baena Lopez
+     * @version 4.0
+     */
+    private void updateContactTable() throws IOException {
+        selectedContactList.clear();
+        contactAdminPanel.generateTable(partialContactList);
     }
 }

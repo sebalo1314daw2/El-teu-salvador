@@ -165,6 +165,16 @@ public class MainView extends JFrame {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
     /**
+     * showSuccessMsg()
+     * This procedure shows the specified successful message
+     * @author Sergio Baena Lopez
+     * @version 4.0
+     * @param String msg the successful message to show
+     */
+    public void showSuccessMsg(String msg) {
+        JOptionPane.showMessageDialog(this, msg, "Èxit", JOptionPane.INFORMATION_MESSAGE);
+    }
+    /**
      * changeView()
      * This procedure changes its current view (ContentPane)
      * @author Sergio Baena Lopez
