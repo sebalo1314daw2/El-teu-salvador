@@ -1,11 +1,14 @@
 package el_teu_salvador.control;
 
 import el_teu_salvador.model.Contact;
+import el_teu_salvador.model.ContactList;
+import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
 import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.MainView;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JCheckBox;
@@ -14,12 +17,13 @@ public class Controller {
     // ================================ Attributes =====================================================
     private MainView mainView;
     private ContactAdminPanel contactAdminPanel;
-    private List<Contact> contactList;
-    private List<Contact> selectedContactList;
+    private ContactList totalContactList;
+    private ContactList partialContactList;
+    private ContactList selectedContactList;
     // ================================ Constructors =====================================================
     public Controller() {
         initViews();
-        selectedContactList = new ArrayList<Contact>();
+        selectedContactList = new ContactList();
     }
     // ================================ Methods =====================================================
     /**
@@ -35,7 +39,7 @@ public class Controller {
      * importContacts()
      * This procedure imports all the contacts from a VCF file
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 3.0
      */
     public void importContacts() {
 //        http://www.forosdelweb.com/f45/netbeans-java-convertir-string-imagen-898488/
@@ -43,12 +47,13 @@ public class Controller {
         try {
             VCF vcf = mainView.selectVCF();
             if( vcf.validate() ) { // VCF is valid --> We read the VCF file
-                contactList = vcf.read();
-                ImageFile.generate(contactList);
-                contactAdminPanel = new ContactAdminPanel(this, contactList);
+                totalContactList = vcf.read();
+                partialContactList = new ContactList(totalContactList); 
+                ImageFile.generate(totalContactList);
+                contactAdminPanel = new ContactAdminPanel(this, partialContactList);
                 mainView.changeView(contactAdminPanel);
             } else { // VCF isn't valid --> we show an error message
-                mainView.showErrorMsg(MainView.INVALID_VCF);
+                mainView.showErrorMsg(MainView.INVALID_VCF_MSG);
             }
         } catch(VCFNotSelectedException e) {
             // We do nothing
@@ -77,11 +82,11 @@ public class Controller {
      * selectAllContacts()
      * This procedure selects all the contacts 
      * @author Sergio Baena Lopez
-     * @version 2.1
+     * @version 3.0
      */
     public void selectAllContacts() {
         contactAdminPanel.checkAll();
-        selectedContactList = new ArrayList<Contact>(contactList);
+        selectedContactList = new ContactList(partialContactList);
     }
     /**
      * deselectAllContacts()
@@ -92,5 +97,57 @@ public class Controller {
     public void deselectAllContacts() {
         contactAdminPanel.uncheckAll();
         selectedContactList.clear();
+    }
+    /**
+     * quitPlaceholderIfIsNecessary()
+     * This procedure quits the placeholder if is it necessary
+     * @author Sergio Baena Lopez
+     * @version 3.0
+     */
+    public void quitPlaceholderIfIsNecessary() {
+        contactAdminPanel.quitPlaceholderIfIsNecessary();
+    }
+   /**
+    * putPlaceholderIfIsNecessary()
+    * This procedure puts the placeholder if is it necessary
+    * @author Sergio Baena Lopez
+    * @version 3.0
+    */
+    public void putPlaceholderIfIsNecessary() {
+        contactAdminPanel.putPlaceholderIfIsNecessary();
+    }
+    /**
+     * findContacts()
+     * This procedure finds the read contacts in the total list of contacts and it'll set
+     * the new partial list of contacts 
+     * @author Sergio Baena Lopez
+     * @version 3.0
+     */
+    public void findContacts() {
+        try {
+            Contact readContact = contactAdminPanel.readSearchEngine();
+            partialContactList = totalContactList.find(readContact);
+            selectedContactList.clear();
+            contactAdminPanel.generateTable(partialContactList);
+        } catch(ContactNotFoundException e) {
+            mainView.showErrorMsg(ContactAdminPanel.CONTACT_NOT_FOUND_MSG);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * listAllContacts()
+     * This procedure lists all the contacts
+     * @author Sergio Baena Lopez
+     * @version 3.0
+     */
+    public void listAllContacts() {
+        try {
+            partialContactList = new ContactList(totalContactList);
+            selectedContactList.clear();
+            contactAdminPanel.generateTable(partialContactList);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

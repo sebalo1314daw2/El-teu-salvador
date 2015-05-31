@@ -1,6 +1,7 @@
 package el_teu_salvador.model.persistence;
 
 import el_teu_salvador.model.Contact;
+import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.Photo;
 import el_teu_salvador.model.exceptions.VCFCorruptedException;
@@ -72,11 +73,11 @@ public class VCF {
      * read()
      * This function reads the VCF. 
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 3.0
      * @throws VCFCorruptedException if the VCF file is corrupted
-     * @return List<Contact> the got list of contacts
+     * @return ContactList the got list of contacts
      */
-    public List<Contact> read() throws FileNotFoundException, IOException, VCFCorruptedException {
+    public ContactList read() throws FileNotFoundException, IOException, VCFCorruptedException {
         BufferedReader file = new BufferedReader( new FileReader(source) );
         
         for(int i = 0; i < 2; i++) {
@@ -116,7 +117,7 @@ public class VCF {
         // We've already read all which we want       
         // We've to close the file and we've to call the method read which is appropiated
         file.close();
-        List<Contact> contactList = null; 
+        ContactList contactList = null; 
         switch(version) {
             case "2.1":
                 contactList = read2_1();
@@ -134,13 +135,13 @@ public class VCF {
      * read2_1()
      * This function reads the VCF with the 2.1 version 
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 3.0
      * @throws VCFCorruptedException if the VCF file is corrupted
-     * @return List<Contact> the got list of contacts
+     * @return ContactList the got list of contacts
      */
-    private List<Contact> read2_1() throws FileNotFoundException, IOException, VCFCorruptedException {
+    private ContactList read2_1() throws FileNotFoundException, IOException, VCFCorruptedException {
         BufferedReader file = new BufferedReader( new FileReader(source) );
-        List<Contact> contactList = new ArrayList<Contact>();
+        ContactList contactList = new ContactList();
         boolean isEOF = false;
         int i = 0;
         String readLine = null;
@@ -254,22 +255,22 @@ public class VCF {
      * read3_0()
      * This function reads the VCF with the 3.0 version 
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 3.0
      * @throws VCFCorruptedException if the VCF file is corrupted
-     * @return List<Contact> the got list of contacts
+     * @return ContactList the got list of contacts
      */
-    private List<Contact> read3_0() {
+    private ContactList read3_0() {
         return null; // TODO
     }
     /**
      * read4_0()
      * This function reads the VCF with the 4.0 version 
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 3.0
      * @throws VCFCorruptedException if the VCF file is corrupted
-     * @return List<Contact> the got list of contacts
+     * @return ContactList the got list of contacts
      */
-    private List<Contact> read4_0() {
+    private ContactList read4_0() {
         return null; // TODO
     }
 }

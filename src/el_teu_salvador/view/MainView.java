@@ -30,7 +30,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class MainView extends JFrame {
     // =============================== Attributes ======================================================
     private Controller controller;
-    public static final String INVALID_VCF = "L'arxiu seleccionat no és del tipus VCF";
+    public static final String INVALID_VCF_MSG = "L'arxiu seleccionat no és del tipus VCF";
     // ================================ Constructors =====================================================
     public MainView(Controller controller) {
         initComponents();

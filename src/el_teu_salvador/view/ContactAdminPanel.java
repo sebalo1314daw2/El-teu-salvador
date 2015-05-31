@@ -2,6 +2,7 @@ package el_teu_salvador.view;
 
 import el_teu_salvador.control.Controller;
 import el_teu_salvador.model.Contact;
+import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Phone;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -9,6 +10,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,17 +23,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 public class ContactAdminPanel extends JPanel {
     // =============================== Attributes ======================================================
     private Controller controller;
     private JScrollPane scrollTable;
     private List<JCheckBox> checkboxesList;
+    private JTextField searchEngine;
+    private boolean isFirstTime;
+    
+    private static final String PLACEHOLDER_MSG = "Cerca pel nom";
+    public static final String CONTACT_NOT_FOUND_MSG = "No s'ha trobat cap contacte";
     // ================================ Constructors =====================================================
-    public ContactAdminPanel(Controller controller, List<Contact> contactList) throws IOException {
+    public ContactAdminPanel(Controller controller, ContactList contactList) throws IOException {
         checkboxesList = new ArrayList<JCheckBox>();
+        isFirstTime = true;
         initComponents(contactList);
         this.controller = controller;
     }
@@ -40,9 +47,9 @@ public class ContactAdminPanel extends JPanel {
      * This procedure initializes all the components of the contacts' administration
      * @author Sergio Baena Lopez
      * @version 1.0
-     * @param List<Contact> contactList the list of contact to manage
+     * @param ContactList contactList the list of contact to manage
      */
-    private void initComponents(List<Contact> contactList) throws IOException {
+    private void initComponents(ContactList contactList) throws IOException {
         // Setting the layout 
         this.setLayout( new BoxLayout(this, BoxLayout.Y_AXIS) );
         // Creating the container of the title
@@ -55,10 +62,18 @@ public class ContactAdminPanel extends JPanel {
         // Creating the container of search engine
         JPanel searchEngineContainer = new JPanel();
         searchEngineContainer.setLayout( new FlowLayout(FlowLayout.CENTER) );
-        JTextField searchEngine = new JTextField("Cerca pel nom", 30);
+        searchEngine = new JTextField(30);
         searchEngine.setHorizontalAlignment(SwingConstants.CENTER);
-        searchEngine.setForeground( new Color(138, 138, 138) );
+        this.putPlaceholderIfIsNecessary();
+        searchEngine.addFocusListener(new FocusListener() {public void focusGained(FocusEvent fe) {
+            controller.quitPlaceholderIfIsNecessary();
+        } public void focusLost(FocusEvent fe) {
+            controller.putPlaceholderIfIsNecessary();
+        }});
         JButton searchButton = new JButton("Cercar");
+        searchButton.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent ae) {
+            controller.findContacts();
+        }});
         searchEngineContainer.add(searchEngine);
         searchEngineContainer.add(searchButton);
         searchEngineContainer.setBackground( new Color(199, 199, 193) );
@@ -67,27 +82,22 @@ public class ContactAdminPanel extends JPanel {
         JPanel buttonGroupContainer = new JPanel();
         buttonGroupContainer.setLayout( new FlowLayout(FlowLayout.CENTER) );
         JButton addButton = new JButton("Afegir");
+        JButton listAllButton = new JButton("Llistar tots");
+        listAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.listAllContacts();
+        }});
         JButton editButton = new JButton("Editar");
         JButton deleteButton = new JButton("Eliminar");
         JButton selectAllButton = new JButton("Seleccionar tot");
-        selectAllButton.addActionListener (
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        controller.selectAllContacts();
-                    }
-                }
-        );
+        selectAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.selectAllContacts();
+        }});
         JButton clearButton = new JButton("Netejar selecció");
-        clearButton.addActionListener (
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        controller.deselectAllContacts();
-                    }
-                }
-        );
+        clearButton.addActionListener (new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.deselectAllContacts();
+        }});
         buttonGroupContainer.add(addButton);
+        buttonGroupContainer.add(listAllButton);
         buttonGroupContainer.add(editButton);
         buttonGroupContainer.add(deleteButton);
         buttonGroupContainer.add(selectAllButton);
@@ -96,16 +106,15 @@ public class ContactAdminPanel extends JPanel {
         this.add(buttonGroupContainer);
         // Creating the table of contacts
         generateTable(contactList);
-        this.add(scrollTable);
     }
     /**
      * generateTable()
      * This procedure generates the table of contacts
      * @author Sergio Baena Lopez
-     * @version 1.0
-     * @param List<Contact> contactList the list of contact of the table to generate
+     * @version 3.0
+     * @param ContactList contactList the list of contact of the table to generate
      */
-    public void generateTable(List<Contact> contactList) throws IOException {
+    public void generateTable(ContactList contactList) throws IOException {
         JPanel table = new JPanel();
         // Setting layout
         table.setLayout( new GridLayout(0, 4, 8, 11) );
@@ -121,12 +130,9 @@ public class ContactAdminPanel extends JPanel {
             // Setting a checkbox
             final JCheckBox aCheckbox = new JCheckBox();
             aCheckbox.setPreferredSize( new Dimension(11, 11) );
-            aCheckbox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    controller.modifySelectedContactList(aCheckbox, aContact);
-                }
-            });
+            aCheckbox.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+                controller.modifySelectedContactList(aCheckbox, aContact);
+            }});
             checkboxesList.add(aCheckbox);        
             table.add(aCheckbox);
             // Setting the photo
@@ -141,8 +147,14 @@ public class ContactAdminPanel extends JPanel {
             table.add(listComponent);
         }
         // We create a scroll pane y add the table
+        if(!isFirstTime) {
+            this.remove(scrollTable);
+        } else {
+            isFirstTime = false;
+        }
         scrollTable = new JScrollPane(table);
-        scrollTable.validate();
+        this.add(scrollTable);
+        this.validate();
     }
         /**
          * obtainPhoneListComponent()
@@ -194,6 +206,47 @@ public class ContactAdminPanel extends JPanel {
            for(int i = 0; i < checkboxesList.size(); i++) {
                 checkboxesList.get(i).setSelected(false);
            }           
+       }
+       /**
+        * quitPlaceholderIfIsNecessary()
+        * This procedure quits the placeholder if is it necessary
+        * @author Sergio Baena Lopez
+        * @version 3.0
+        */
+       public void quitPlaceholderIfIsNecessary() {
+           if( searchEngine.getText().equals(PLACEHOLDER_MSG) ) { // We've to quit the placeholder
+                searchEngine.setText("");
+                searchEngine.setForeground(Color.BLACK);
+           }
+       }
+       /**
+        * putPlaceholderIfIsNecessary()
+        * This procedure puts the placeholder if is it necessary
+        * @author Sergio Baena Lopez
+        * @version 3.0
+        */
+       public void putPlaceholderIfIsNecessary() {
+           if( searchEngine.getText().equals("") ) {
+                searchEngine.setText(PLACEHOLDER_MSG);
+                searchEngine.setForeground( new Color(138, 138, 138) );
+           }
+       }
+       /**
+        * readSearchEngine()
+        * This function reads the search engine
+        * @author Sergio Baena Lopez
+        * @version 3.0
+        * @return Contact the search engine as contact
+        */
+       public Contact readSearchEngine() {
+           String readTextbox = searchEngine.getText();
+           Contact readContact;
+           if( readTextbox.equals(PLACEHOLDER_MSG) ) {
+               readContact = new Contact("");
+           } else {
+               readContact = new Contact(readTextbox);
+           }
+           return readContact;
        }
     }
        

@@ -13,6 +13,10 @@ public class Contact {
     public Contact() {
         phoneList = new ArrayList<Phone>();
     }
+
+    public Contact(String name) {
+        this.name = name;
+    }
     // ================================ Accessors =====================================================
     public String getName() {
         return name;
