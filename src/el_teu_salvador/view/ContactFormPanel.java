@@ -8,6 +8,8 @@ import el_teu_salvador.model.persistence.ImageFile;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -67,6 +69,9 @@ public class ContactFormPanel extends JPanel {
         JPanel buttonGroupContainer = new JPanel();
         buttonGroupContainer.setLayout( new FlowLayout(FlowLayout.CENTER) );
         JButton addPhoneButton = new JButton("Afegir telèfon");
+        addPhoneButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.addPhoneField();
+        }});
         JButton removePhoneButton = new JButton("Eliminar telèfon");
         JButton confirmButton;
         if(contact == null) { // the form is a register
@@ -194,5 +199,23 @@ public class ContactFormPanel extends JPanel {
      */
      private JComboBox obtainSelect() {
          return obtainSelect( new Phone(Phone.MOBILE) );
+     }
+     /**
+      * addPhoneField()
+      * This procedure adds a new phone's field
+      * @author Sergio Baena Lopez
+      * @version 5.1
+      */
+     public void addPhoneField() {
+        JComboBox aSelect = obtainSelect();
+        JTextField aTextbox = new JTextField();
+
+        selectList.add(aSelect);
+        textboxList.add(aTextbox);
+
+        form.add(aSelect);
+        form.add(aTextbox);
+        
+        this.validate();
      }
 }

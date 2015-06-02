@@ -2,7 +2,6 @@ package el_teu_salvador.control;
 
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
-import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
@@ -13,7 +12,6 @@ import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
 import java.io.IOException;
 import javax.swing.JCheckBox;
-import javax.swing.JPanel;
 
 public class Controller {
     // ================================ Attributes =====================================================
@@ -193,5 +191,14 @@ public class Controller {
         contactFormPanel = new ContactFormPanel(this, null);
         mainView.setContentPane(contactFormPanel);
         mainView.validate();
+    }
+    /**
+     * addPhoneField()
+     * This procedure adds a new phone's field
+     * @author Sergio Baena Lopez
+     * @version 5.1
+     */
+    public void addPhoneField() {
+        contactFormPanel.addPhoneField();
     }
 }
