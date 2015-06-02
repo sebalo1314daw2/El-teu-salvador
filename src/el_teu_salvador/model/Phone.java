@@ -9,6 +9,11 @@ public class Phone {
     public static final int LANDLINE = 1;
     // ================================ Constructors =====================================================
     public Phone() {}
+
+    public Phone(int type) {
+        this.type = type;
+    }
+    
     // ================================ Accessors =====================================================
     public int getType() {
         return type;

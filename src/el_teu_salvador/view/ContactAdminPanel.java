@@ -84,6 +84,9 @@ public class ContactAdminPanel extends JPanel {
         JPanel buttonGroupContainer = new JPanel();
         buttonGroupContainer.setLayout( new FlowLayout(FlowLayout.CENTER) );
         JButton addButton = new JButton("Afegir");
+        addButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.showContactRegister();
+        }});
         JButton listAllButton = new JButton("Llistar tots");
         listAllButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
             controller.listAllContacts();

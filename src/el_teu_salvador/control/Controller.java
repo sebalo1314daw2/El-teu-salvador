@@ -2,20 +2,25 @@ package el_teu_salvador.control;
 
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
+import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
 import el_teu_salvador.view.ContactAdminPanel;
+import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
 import java.io.IOException;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 public class Controller {
     // ================================ Attributes =====================================================
     private MainView mainView;
     private ContactAdminPanel contactAdminPanel;
+    private ContactFormPanel contactFormPanel;
+    
     private ContactList totalContactList;
     private ContactList partialContactList;
     private ContactList selectedContactList;
@@ -50,7 +55,8 @@ public class Controller {
                 partialContactList = new ContactList(totalContactList); 
                 ImageFile.generate(totalContactList);
                 contactAdminPanel = new ContactAdminPanel(this, partialContactList);
-                mainView.changeView(contactAdminPanel);
+                mainView.setContentPane(contactAdminPanel);
+                mainView.validate();
             } else { // VCF isn't valid --> we show an error message
                 mainView.showErrorMsg(MainView.INVALID_VCF_MSG);
             }
@@ -176,5 +182,16 @@ public class Controller {
     private void updateContactTable() throws IOException {
         selectedContactList.clear();
         contactAdminPanel.generateTable(partialContactList);
+    }
+    /**
+     * showContactRegister()
+     * This procedure shows the contact's register
+     * @author Sergio Baena Lopez
+     * @version 5.0
+     */
+    public void showContactRegister() {
+        contactFormPanel = new ContactFormPanel(this, null);
+        mainView.setContentPane(contactFormPanel);
+        mainView.validate();
     }
 }

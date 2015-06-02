@@ -5,21 +5,12 @@ import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -173,17 +164,6 @@ public class MainView extends JFrame {
      */
     public void showSuccessMsg(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Èxit", JOptionPane.INFORMATION_MESSAGE);
-    }
-    /**
-     * changeView()
-     * This procedure changes its current view (ContentPane)
-     * @author Sergio Baena Lopez
-     * @version 1.0
-     * @param JPanel view the view to set
-     */
-    public void changeView(JPanel view) {
-        this.setContentPane(view);
-        this.validate();
     }
     /**
      * obtainImageComponent()

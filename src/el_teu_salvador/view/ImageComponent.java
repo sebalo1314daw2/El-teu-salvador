@@ -16,6 +16,15 @@ public class ImageComponent extends JPanel {
         this.setPreferredSize(new Dimension(96, 96) );
         this.file = file;
     }
+
+    public ImageComponent(String path) {
+        this( new File(path) );
+    }
+    // ================================ Accessors =====================================================
+    public void setFile(File file) {
+        this.file = file;
+        this.repaint();
+    }
     // ================================ Methods =====================================================
     @Override
     public void paint(Graphics grphcs) {
