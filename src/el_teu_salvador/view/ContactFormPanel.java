@@ -84,6 +84,9 @@ public class ContactFormPanel extends JPanel {
             confirmButton = new JButton("Editar");
         }
         JButton cancelButton = new JButton("Cancel·lar");
+        cancelButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.cancelContactForm();
+        }});
         buttonGroupContainer.add(addPhoneButton);
         buttonGroupContainer.add(removePhoneButton);
         buttonGroupContainer.add(confirmButton);

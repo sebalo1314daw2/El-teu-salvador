@@ -13,6 +13,7 @@ import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
 import java.io.IOException;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 public class Controller {
     // ================================ Attributes =====================================================
@@ -42,7 +43,7 @@ public class Controller {
      * importContacts()
      * This procedure imports all the contacts from a VCF file
      * @author Sergio Baena Lopez
-     * @version 3.0
+     * @version 5.3
      */
     public void importContacts() {
 //        http://www.forosdelweb.com/f45/netbeans-java-convertir-string-imagen-898488/
@@ -54,8 +55,7 @@ public class Controller {
                 partialContactList = new ContactList(totalContactList); 
                 ImageFile.generate(totalContactList);
                 contactAdminPanel = new ContactAdminPanel(this, partialContactList);
-                mainView.setContentPane(contactAdminPanel);
-                mainView.validate();
+                changeView(contactAdminPanel);
             } else { // VCF isn't valid --> we show an error message
                 mainView.showErrorMsg(MainView.INVALID_VCF_MSG);
             }
@@ -186,12 +186,11 @@ public class Controller {
      * showContactRegister()
      * This procedure shows the contact's register
      * @author Sergio Baena Lopez
-     * @version 5.0
+     * @version 5.3
      */
     public void showContactRegister() {
         contactFormPanel = new ContactFormPanel(this, null);
-        mainView.setContentPane(contactFormPanel);
-        mainView.validate();
+        changeView(contactFormPanel);
     }
     /**
      * addPhoneField()
@@ -214,5 +213,26 @@ public class Controller {
         } catch(PhoneFieldNotFoundException e) {
             // We do nothing
         }
+    }
+    /**
+     * changeView()
+     * This procedure changes the current view to the specified view
+     * @author Sergio Baena Lopez
+     * @version 5.3
+     * @param JPanel view the view to change
+     */
+    private void changeView(JPanel view) {
+        mainView.setContentPane(view);
+        mainView.validate();
+    }
+    /**
+     * cancelContactForm()
+     * This procedure cancels the contact's form
+     * @author Sergio Baena Lopez
+     * @version 5.3
+     */
+    public void cancelContactForm() {
+        changeView(contactAdminPanel);
+        contactFormPanel = null;
     }
 }
