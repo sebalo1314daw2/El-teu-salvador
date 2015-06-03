@@ -4,6 +4,7 @@ import el_teu_salvador.control.Controller;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.Photo;
+import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
 import el_teu_salvador.model.persistence.ImageFile;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -73,6 +74,9 @@ public class ContactFormPanel extends JPanel {
             controller.addPhoneField();
         }});
         JButton removePhoneButton = new JButton("Eliminar telèfon");
+        removePhoneButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.removePhoneField();
+        }});
         JButton confirmButton;
         if(contact == null) { // the form is a register
             confirmButton = new JButton("Afegir");
@@ -126,6 +130,8 @@ public class ContactFormPanel extends JPanel {
         
         form.add(nameLabel);
         form.add(nameTextbox);
+        
+        addPhoneField();
     }
     /**
      * generateEditionForm()
@@ -217,5 +223,27 @@ public class ContactFormPanel extends JPanel {
         form.add(aTextbox);
         
         this.validate();
+     }
+     /**
+      * removePhoneField()
+      * This procedure removes the last phone's field
+      * @author Sergio Baena Lopez
+      * @version 5.2
+      * @throws PhoneFieldNotFoundException if the phone field wasn't found in the form
+      */
+     public void removePhoneField() throws PhoneFieldNotFoundException {
+         if( selectList.isEmpty() ) { // There aren't more phone fields
+             throw new PhoneFieldNotFoundException("The removing of phone fields are impossible");
+         }
+         
+         int index = selectList.size() - 1;
+         
+         form.remove( selectList.get(index) );
+         form.remove( textboxList.get(index) );
+         
+         form.validate();
+         
+         selectList.remove(index);
+         textboxList.remove(index);
      }
 }

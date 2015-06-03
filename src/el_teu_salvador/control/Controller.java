@@ -4,6 +4,7 @@ import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
+import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
@@ -200,5 +201,18 @@ public class Controller {
      */
     public void addPhoneField() {
         contactFormPanel.addPhoneField();
+    }
+   /**
+    * removePhoneField()
+    * This procedure removes the last phone's field
+    * @author Sergio Baena Lopez
+    * @version 5.2
+    */
+    public void removePhoneField() {
+        try {
+            contactFormPanel.removePhoneField();
+        } catch(PhoneFieldNotFoundException e) {
+            // We do nothing
+        }
     }
 }
