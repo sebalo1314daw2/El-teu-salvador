@@ -5,21 +5,28 @@ import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.Photo;
 import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
+import el_teu_salvador.model.exceptions.PhotoNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ContactFormPanel extends JPanel {
     // =============================== Attributes ======================================================
@@ -29,6 +36,10 @@ public class ContactFormPanel extends JPanel {
     private JTextField nameTextbox;
     private List<JComboBox> selectList;
     private List<JTextField> textboxList;
+    
+    public static final String NO_PHOTO_MSG = "Has de seleccionar una foto.";
+    public static final String WRONG_DIMENSION_MSG = "La foto ha de ser 96x96.";
+    public static final String PHOTO_NOT_SELECTED_MSG = "";
     // ================================ Constructors =====================================================
     public ContactFormPanel(Controller controller, Contact contact) {
         this.controller = controller;
@@ -120,12 +131,20 @@ public class ContactFormPanel extends JPanel {
      * generateRegisterForm()
      * This procedure generates the register form
      * @author Sergio Baena Lopez
-     * @version 5.0
+     * @version 5.4
      */
     private void generateRegisterForm() {
-        imageComponent = new ImageComponent (
-            ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
+        Photo photo = new Photo ( 
+            new File (
+                ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
+            )  
         );
+        imageComponent = new ImageComponent(photo);
+        imageComponent.setCursor( new Cursor(Cursor.HAND_CURSOR) );
+        imageComponent.setToolTipText("Fes clic per canviar la foto");
+        imageComponent.addMouseListener(new MouseAdapter(){public void mouseClicked(MouseEvent me) {
+             controller.selectNewPhoto();
+        }});
         form.add(imageComponent);
         // Name field
         JLabel nameLabel = new JLabel("Nom");
@@ -140,25 +159,26 @@ public class ContactFormPanel extends JPanel {
      * generateEditionForm()
      * This procedure generates the form of edition
      * @author Sergio Baena Lopez
-     * @version 5.0
+     * @version 5.4
      * @param Contact contact the contact to modify
      */
     private void generateEditionForm(Contact contact) {
         Photo photo = contact.getPhoto();
         String name = contact.getName();
+        File source;
         
         if(photo == null) { // the contact hasn't photo
-            imageComponent = new ImageComponent (
-                ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
-            );
+            source = new File(ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH);
         } else { // the contact has photo
-            imageComponent = new ImageComponent (
+            source = new File (
                 ImageFile.CONTAINER_DIRECTORY_PATH  + 
                 name                                +
                 "."                                 + 
                 photo.getType()
             );
         }
+        photo.setSource(source);
+        imageComponent = new ImageComponent(photo);
         form.add(imageComponent);
         // Name field 
         JLabel nameLabel = new JLabel("Nom");
@@ -248,5 +268,43 @@ public class ContactFormPanel extends JPanel {
          
          selectList.remove(index);
          textboxList.remove(index);
+     }
+     /**
+      * read()
+      * This function reads the form
+      * @author Sergio Baena Lopez
+      * @version 5.4
+      * @return Contact the read contact
+      */
+//     public Contact read() {
+//         // TODO
+//     }
+     /**
+      * selectPhoto()
+      * This function affords to select a photo to the user
+      * @author Sergio Baena Lopez
+      * @version 5.4
+      * @throws PhotoNotSelectedException if the user didn't select any photo
+      * @return Photo the selected photo
+      */
+     public Photo selectPhoto() throws PhotoNotSelectedException {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Imatge", "jpg", "jpeg", "png", "gif");
+        fileChooser.setFileFilter(filter);
+        int selection = fileChooser.showDialog(this, "Seleccionar foto");
+        if(selection != JFileChooser.APPROVE_OPTION) {
+            throw new PhotoNotSelectedException("The user doesn't select any photo");
+        }
+        return new Photo( fileChooser.getSelectedFile() ); 
+     }
+     /**
+      * changePhoto()
+      * This procedure changes the photo of the form
+      * @author Sergio Baena Lopez
+      * @version 5.4
+      * @param Photo photo the photo to change
+      */
+     public void changePhoto(Photo photo) {
+         imageComponent.setPhoto(photo);
      }
 }

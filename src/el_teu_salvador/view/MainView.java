@@ -2,6 +2,7 @@ package el_teu_salvador.view;
 
 import el_teu_salvador.control.Controller;
 import el_teu_salvador.model.Contact;
+import el_teu_salvador.model.Photo;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
@@ -15,7 +16,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainView extends JFrame {
@@ -169,28 +169,33 @@ public class MainView extends JFrame {
      * obtainImageComponent()
      * This function obtains the image component from the specified contact
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 5.4
      * @throws FileNotFoundException if the image file wasn't found
      * @param Contact contact the contact whose image component we want to obtain
      * @return ImageComponent the image component
      */
     public static ImageComponent obtainImageComponent(Contact contact) throws FileNotFoundException {
-        File source;
+        Photo photo;
         if(contact.getPhoto() == null) { // This contact doesn't have photo
-            source = new File (
-                ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
+            photo = new Photo (
+                new File (
+                    ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH
+                )
             );
         } else { // This contact has photo
-            source = new File (
-                ImageFile.CONTAINER_DIRECTORY_PATH  +
-                contact.getName()                   +
-                "."                                 + 
-                contact.getPhoto().getType()
+            photo = new Photo ( 
+                new File (
+                    ImageFile.CONTAINER_DIRECTORY_PATH  +
+                    contact.getName()                   +
+                    "."                                 + 
+                    contact.getPhoto().getType()
+                )
             );
         }
+        File source = photo.getSource();
         if( !source.exists() ) {
             throw new FileNotFoundException("The file image " + source + " wasn't found");
         } // The file image was found
-        return new ImageComponent(source);
+        return new ImageComponent(photo);
     }
 }

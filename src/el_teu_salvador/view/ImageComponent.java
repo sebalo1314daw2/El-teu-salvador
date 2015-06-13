@@ -1,8 +1,8 @@
 package el_teu_salvador.view;
 
+import el_teu_salvador.model.Photo;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -10,19 +10,15 @@ import javax.swing.JPanel;
 
 public class ImageComponent extends JPanel {
     // ================================ Attributes =====================================================
-    private File file;
+    private Photo photo;
     // ================================ Constructors =====================================================
-    public ImageComponent(File file) {
+    public ImageComponent(Photo photo) {
         this.setPreferredSize(new Dimension(96, 96) );
-        this.file = file;
-    }
-
-    public ImageComponent(String path) {
-        this( new File(path) );
+        this.photo = photo;
     }
     // ================================ Accessors =====================================================
-    public void setFile(File file) {
-        this.file = file;
+    public void setPhoto(Photo photo) {
+        this.photo = photo;
         this.repaint();
     }
     // ================================ Methods =====================================================
@@ -30,7 +26,7 @@ public class ImageComponent extends JPanel {
     public void paint(Graphics grphcs) {
         try {
             Dimension dimension = new Dimension(96, 96);
-            ImageIcon imgIcon = new ImageIcon( ImageIO.read(file) );
+            ImageIcon imgIcon = new ImageIcon( ImageIO.read( photo.getSource() ) );
             grphcs.drawImage(imgIcon.getImage(), 0, 0, dimension.width, dimension.height, null);
             this.setOpaque(false);
             super.paintComponent(grphcs);

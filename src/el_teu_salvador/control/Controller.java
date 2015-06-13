@@ -2,9 +2,11 @@ package el_teu_salvador.control;
 
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
+import el_teu_salvador.model.Photo;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
+import el_teu_salvador.model.exceptions.PhotoNotSelectedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
@@ -164,8 +166,6 @@ public class Controller {
             totalContactList.remove(selectedContactList);
             
             updateContactTable();
-            
-            mainView.showSuccessMsg(ContactAdminPanel.SUCCESSFUL_REMOVING_MSG);
         } catch(NoContactSpecifiedException e) {
             mainView.showErrorMsg(ContactAdminPanel.NO_CONTACT_SELECTED_MSG);
         } catch(Exception e) {
@@ -234,5 +234,26 @@ public class Controller {
     public void cancelContactForm() {
         changeView(contactAdminPanel);
         contactFormPanel = null;
+    }
+    /**
+     * selectNewPhoto()
+     * This procedure selects a new photo
+     * @author Sergio Baena Lopez
+     * @version 5.4
+     */
+    public void selectNewPhoto() {
+        try {
+            Photo selectedPhoto = contactFormPanel.selectPhoto();
+            int resultValidation = selectedPhoto.validate();
+            if(resultValidation == Photo.OK) { // The selected photo is valid
+                contactFormPanel.changePhoto(selectedPhoto);
+            } else if(resultValidation == Photo.NO_PHOTO) { 
+                mainView.showErrorMsg( ContactFormPanel.NO_PHOTO_MSG );
+            } else if(resultValidation == Photo.WRONG_DIMENSION) {
+                mainView.showErrorMsg( ContactFormPanel.WRONG_DIMENSION_MSG );
+            }
+        } catch(PhotoNotSelectedException e) {
+            // We do nothing
+        }
     }
 }

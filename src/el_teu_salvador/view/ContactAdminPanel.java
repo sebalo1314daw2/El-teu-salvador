@@ -35,7 +35,6 @@ public class ContactAdminPanel extends JPanel {
     private static final String PLACEHOLDER_MSG = "Cerca pel nom";
     public static final String CONTACT_NOT_FOUND_MSG = "No s'ha trobat cap contacte";
     public static final String NO_CONTACT_SELECTED_MSG = "No has seleccionat cap contacte";
-    public static final String SUCCESSFUL_REMOVING_MSG = "El/s contacte/s ha/n sigut eliminat/s satisfactòriament";
     // ================================ Constructors =====================================================
     public ContactAdminPanel(Controller controller, ContactList contactList) throws IOException {
         checkboxesList = new ArrayList<JCheckBox>();
