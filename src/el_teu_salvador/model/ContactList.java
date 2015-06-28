@@ -1,5 +1,6 @@
 package el_teu_salvador.model;
 
+import el_teu_salvador.model.exceptions.ContactAlreadyExistsException;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import java.util.ArrayList;
@@ -57,5 +58,25 @@ public class ContactList extends ArrayList<Contact> {
         for(int i = 0; i < contactList.size(); i++) {
             this.remove( contactList.get(i) );
         }
+    }
+
+    /**
+     * add()
+     * This function adds the specified contact to the list
+     * @author Sergio Baena Lopez
+     * @version 5.5
+     * @throws ContactAlreadyExistsException if the contact to add already exists in the list
+     * @param Contact contact the contact to add
+     * @return boolean this function always returns true
+     */
+    @Override
+    public boolean add(Contact contact) {
+        if( this.contains(contact) ) {
+            throw new ContactAlreadyExistsException("The contact " + contact + "already exists in the list");
+        }
+        
+        super.add(contact);
+        
+        return true;
     }
 }

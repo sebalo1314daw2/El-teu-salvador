@@ -101,4 +101,40 @@ public class Photo {
         }
         return result;
     }
+    /**
+     * obtainExtension()
+     * This function obtains the extension of the photo
+     * @author Sergio Baena Lopez
+     * @version 5.5
+     * @return String the extension of the photo
+     */
+    public String obtainExtension() {
+        String [] splitedNameSource = source.getName().split("[.]");
+        return splitedNameSource[splitedNameSource.length - 1].toUpperCase();
+    }
+    /**
+     * obtainType()
+     * This function obtains the type of the photo. The possible types are JPEG, PNG and GIF.
+     * @author Sergio Baena Lopez
+     * @version 5.5
+     * @return String the type of the photo
+     */
+    public String obtainType() {
+       String type = null;
+       
+       switch( obtainExtension() ) {
+           case "JPG":
+           case "JPEG":
+               type = "JPEG";
+               break;
+           case "PNG":
+               type = "PNG";
+               break;
+            case "GIF":
+               type = "GIF";
+               break;
+       }
+       
+       return type;
+    }
 }

@@ -17,10 +17,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,21 +34,27 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class ContactFormPanel extends JPanel {
     // =============================== Attributes ======================================================
     private Controller controller;
+    private MainView parent;
     private JPanel form;
     private ImageComponent imageComponent;
     private JTextField nameTextbox;
     private List<JComboBox> selectList;
     private List<JTextField> textboxList;
+    private Map<String, List<Object>> fieldsInfo;
     
     public static final String NO_PHOTO_MSG = "Has de seleccionar una foto.";
     public static final String WRONG_DIMENSION_MSG = "La foto ha de ser 96x96.";
-    public static final String PHOTO_NOT_SELECTED_MSG = "";
+    public static final String SUCCESSFUL_ADDITION_MSG = "S'ha afegit el contacte satisfactòriament";
+    public static final String CONTACT_ALREADY_EXISTS_MSG = "Aquest contacte ja existeix";
     // ================================ Constructors =====================================================
-    public ContactFormPanel(Controller controller, Contact contact) {
+    public ContactFormPanel(Controller controller, MainView parent, Contact contact) {
         this.controller = controller;
+        this.parent = parent;
         selectList = new ArrayList<JComboBox>();
         textboxList = new ArrayList<JTextField>();
+        fieldsInfo = new HashMap<String, List<Object>>();
         initComponents(contact);
+        initFieldsInfo();
     }
     // ================================ Methods =====================================================
      /**
@@ -74,7 +83,7 @@ public class ContactFormPanel extends JPanel {
      * generateButtonGroup()
      * This procedure generates the button group of the form
      * @author Sergio Baena Lopez
-     * @version 5.0
+     * @version 5.5
      * @param Contact contact the contact to modify or null (if the form is a register)
      */
     private void generateButtonGroup(Contact contact) {
@@ -91,6 +100,9 @@ public class ContactFormPanel extends JPanel {
         JButton confirmButton;
         if(contact == null) { // the form is a register
             confirmButton = new JButton("Afegir");
+            confirmButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+                controller.addContact();
+            }});
         } else {
             confirmButton = new JButton("Editar");
         }
@@ -233,7 +245,7 @@ public class ContactFormPanel extends JPanel {
       * addPhoneField()
       * This procedure adds a new phone's field
       * @author Sergio Baena Lopez
-      * @version 5.1
+      * @version 5.5
       */
      public void addPhoneField() {
         JComboBox aSelect = obtainSelect();
@@ -241,7 +253,13 @@ public class ContactFormPanel extends JPanel {
 
         selectList.add(aSelect);
         textboxList.add(aTextbox);
-
+        
+        int index = textboxList.size() - 1;
+        List<Object> valueAPhone = new ArrayList<Object>();
+        valueAPhone.add("El telèfon " + (index + 1) + " no és vàlid.");
+        valueAPhone.add(aTextbox);
+        fieldsInfo.put(Phone.NUMBER_ATTR_OF_PHONE + index, valueAPhone);
+        
         form.add(aSelect);
         form.add(aTextbox);
         
@@ -251,7 +269,7 @@ public class ContactFormPanel extends JPanel {
       * removePhoneField()
       * This procedure removes the last phone's field
       * @author Sergio Baena Lopez
-      * @version 5.2
+      * @version 5.5
       * @throws PhoneFieldNotFoundException if the phone field wasn't found in the form
       */
      public void removePhoneField() throws PhoneFieldNotFoundException {
@@ -268,17 +286,31 @@ public class ContactFormPanel extends JPanel {
          
          selectList.remove(index);
          textboxList.remove(index);
+         
+         fieldsInfo.remove(Phone.NUMBER_ATTR_OF_PHONE + index);
      }
      /**
       * read()
       * This function reads the form
       * @author Sergio Baena Lopez
-      * @version 5.4
+      * @version 5.5
       * @return Contact the read contact
       */
-//     public Contact read() {
-//         // TODO
-//     }
+     public Contact read() {
+         String name = nameTextbox.getText();
+         
+         List<Phone> phoneList = new ArrayList<Phone>();
+         for(int i = 0; i < selectList.size(); i++) {
+             int aType = selectList.get(i).getSelectedIndex();
+             String aNumber = textboxList.get(i).getText();
+             Phone aPhone = new Phone(aType, aNumber);
+             phoneList.add(aPhone);
+         }
+         
+         Photo photo = imageComponent.getPhoto();
+         
+         return new Contact(name, phoneList, photo);
+     }
      /**
       * selectPhoto()
       * This function affords to select a photo to the user
@@ -306,5 +338,59 @@ public class ContactFormPanel extends JPanel {
       */
      public void changePhoto(Photo photo) {
          imageComponent.setPhoto(photo);
+     }
+     /**
+      * showErrors()
+      * This procedure shows the errors of the form
+      * @author Sergio Baena Lopez
+      * @version 5.5
+      * @param List<String> invalidFieldList the list of the invalid fields
+      */
+     public void showErrors(List<String> invalidFieldList) {
+         StringBuilder errList = new StringBuilder();
+         
+         for(int i = 0; i < invalidFieldList.size(); i++) {
+             String anInvalidField = invalidFieldList.get(i);
+             List<Object> anInfo = fieldsInfo.get(anInvalidField);
+             
+             String anErrMsg = (String)anInfo.get(0);
+             JComponent aComponent = (JComponent)anInfo.get(1);
+             
+             errList.append(anErrMsg);
+             errList.append("\n");
+             
+             aComponent.setBackground(Color.RED);
+             aComponent.setForeground(Color.WHITE);
+         }
+         
+         parent.showErrorMsg( errList.toString() );
+     }
+     /**
+      * initFieldsInfo()
+      * This procedure initializes the fieldsInfo attribute which contains information about each 
+      * field.
+      * @author Sergio Baena Lopez
+      * @version 5.5
+      */
+     private void initFieldsInfo() {       
+        List<Object> valueName = new ArrayList<Object>();
+        valueName.add("El nom està buit.");
+        valueName.add(nameTextbox);
+        fieldsInfo.put(Contact.NAME_ATTR_OF_CONTACT, valueName);
+     }
+     /**
+      * clearErrors()
+      * This procedure clears the errors of the form
+      * @author Sergio Baena Lopez
+      * @version 5.5
+      */
+     public void clearErrors() {
+         nameTextbox.setBackground(Color.WHITE);
+         nameTextbox.setForeground(Color.BLACK);
+         
+         for(int i = 0; i < textboxList.size(); i++) {
+             textboxList.get(i).setBackground(Color.WHITE);
+             textboxList.get(i).setForeground(Color.BLACK);
+         }         
      }
 }

@@ -21,6 +21,10 @@ public class ImageComponent extends JPanel {
         this.photo = photo;
         this.repaint();
     }
+
+    public Photo getPhoto() {
+        return photo;
+    }
     // ================================ Methods =====================================================
     @Override
     public void paint(Graphics grphcs) {

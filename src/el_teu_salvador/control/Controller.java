@@ -3,6 +3,7 @@ package el_teu_salvador.control;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Photo;
+import el_teu_salvador.model.exceptions.ContactAlreadyExistsException;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
@@ -14,6 +15,7 @@ import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
@@ -189,7 +191,7 @@ public class Controller {
      * @version 5.3
      */
     public void showContactRegister() {
-        contactFormPanel = new ContactFormPanel(this, null);
+        contactFormPanel = new ContactFormPanel(this, mainView, null);
         changeView(contactFormPanel);
     }
     /**
@@ -254,6 +256,38 @@ public class Controller {
             }
         } catch(PhotoNotSelectedException e) {
             // We do nothing
+        }
+    }
+    /**
+     * addContact()
+     * This procedure adds the read contact from the form
+     * @author Sergio Baena Lopez
+     * @version 5.5
+     */
+    public void addContact() {
+        try {
+            Contact contact = contactFormPanel.read();
+            List<String> invalidAttrList = contact.validate();
+            contactFormPanel.clearErrors();
+            if( invalidAttrList.isEmpty() ) { // the contact is valid
+                totalContactList.add(contact);
+                partialContactList.add(contact);
+
+                ImageFile.generate(contact);
+                
+                mainView.showSuccessMsg(ContactFormPanel.SUCCESSFUL_ADDITION_MSG);
+
+                updateContactTable();
+
+                changeView(contactAdminPanel);
+                contactFormPanel = null;
+            } else { // the contact is invalid
+                contactFormPanel.showErrors(invalidAttrList);
+            }
+        } catch(ContactAlreadyExistsException e) {
+            mainView.showErrorMsg(ContactFormPanel.CONTACT_ALREADY_EXISTS_MSG);
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 }
