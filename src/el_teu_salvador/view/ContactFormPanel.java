@@ -45,7 +45,6 @@ public class ContactFormPanel extends JPanel {
     public static final String NO_PHOTO_MSG = "Has de seleccionar una foto.";
     public static final String WRONG_DIMENSION_MSG = "La foto ha de ser 96x96.";
     public static final String SUCCESSFUL_ADDITION_MSG = "S'ha afegit el contacte satisfactòriament";
-    public static final String CONTACT_ALREADY_EXISTS_MSG = "Aquest contacte ja existeix";
     // ================================ Constructors =====================================================
     public ContactFormPanel(Controller controller, MainView parent, Contact contact) {
         this.controller = controller;
@@ -181,6 +180,7 @@ public class ContactFormPanel extends JPanel {
         
         if(photo == null) { // the contact hasn't photo
             source = new File(ImageFile.CONTAINER_DIRECTORY_PATH + ImageFile.DEFAULT_IMAGE_PATH);
+            photo = new Photo();
         } else { // the contact has photo
             source = new File (
                 ImageFile.CONTAINER_DIRECTORY_PATH  + 

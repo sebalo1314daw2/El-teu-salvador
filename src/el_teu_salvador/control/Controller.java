@@ -3,7 +3,6 @@ package el_teu_salvador.control;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Photo;
-import el_teu_salvador.model.exceptions.ContactAlreadyExistsException;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
@@ -284,10 +283,28 @@ public class Controller {
             } else { // the contact is invalid
                 contactFormPanel.showErrors(invalidAttrList);
             }
-        } catch(ContactAlreadyExistsException e) {
-            mainView.showErrorMsg(ContactFormPanel.CONTACT_ALREADY_EXISTS_MSG);
         } catch(Exception e) {
             e.printStackTrace();
+        }
+    }
+    /**
+     * showFormContactToModification()
+     * This procedure shows the contact's form to his/her modification
+     * @author Sergio Baena Lopez
+     * @version 6.0
+     */
+    public void showFormContactToModification() {
+        switch( selectedContactList.size() ) {
+            case 0:
+                mainView.showErrorMsg(ContactAdminPanel.NO_CONTACT_SELECTED_MSG);
+                break;
+            case 1:
+                contactFormPanel = new ContactFormPanel( this, mainView, selectedContactList.get(0) );
+                changeView(contactFormPanel);
+                break;
+            default:
+                mainView.showErrorMsg(ContactAdminPanel.TOO_MANY_SELECTED_CONTACTS_MSG);
+                break;
         }
     }
 }

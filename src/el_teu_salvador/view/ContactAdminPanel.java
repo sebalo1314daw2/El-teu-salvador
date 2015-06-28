@@ -35,6 +35,7 @@ public class ContactAdminPanel extends JPanel {
     private static final String PLACEHOLDER_MSG = "Cerca pel nom";
     public static final String CONTACT_NOT_FOUND_MSG = "No s'ha trobat cap contacte";
     public static final String NO_CONTACT_SELECTED_MSG = "No has seleccionat cap contacte";
+    public static final String TOO_MANY_SELECTED_CONTACTS_MSG = "Has de seleccionar solament un contacte";
     // ================================ Constructors =====================================================
     public ContactAdminPanel(Controller controller, ContactList contactList) throws IOException {
         checkboxesList = new ArrayList<JCheckBox>();
@@ -91,6 +92,9 @@ public class ContactAdminPanel extends JPanel {
             controller.listAllContacts();
         }});
         JButton editButton = new JButton("Editar");
+        editButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+            controller.showFormContactToModification();
+        }});
         JButton deleteButton = new JButton("Eliminar");
         deleteButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
             controller.removeContacts();

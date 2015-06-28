@@ -1,6 +1,5 @@
 package el_teu_salvador.model;
 
-import el_teu_salvador.model.exceptions.ContactAlreadyExistsException;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class ContactList extends ArrayList<Contact> {
      * find()
      * This function searches the specified contact in the list
      * @author Sergio Baena Lopez
-     * @version 4.0
+     * @version 6.0
      * @throws ContactNotFoundException if the contact wasn't found
      * @param Contact contact the contact to search
      * @return ContactList the list of found contacts 
@@ -32,9 +31,12 @@ public class ContactList extends ArrayList<Contact> {
         } else {
             for(int i = 0; i < size(); i++) {
                 Contact aContact = get(i);
-                String aName = aContact.getName().toLowerCase();
-                if( aName.indexOf(nameToFind) != -1) { // the name was found
-                    foundContactList.add(aContact);
+                String aName = aContact.getName();
+                if(aName != null) {
+                    aName = aName.toLowerCase();
+                    if( aName.indexOf(nameToFind) != -1) { // the name was found
+                        foundContactList.add(aContact);
+                    }
                 }
             }
             if( foundContactList.isEmpty() ) { // we haven't found any contact 
@@ -58,25 +60,5 @@ public class ContactList extends ArrayList<Contact> {
         for(int i = 0; i < contactList.size(); i++) {
             this.remove( contactList.get(i) );
         }
-    }
-
-    /**
-     * add()
-     * This function adds the specified contact to the list
-     * @author Sergio Baena Lopez
-     * @version 5.5
-     * @throws ContactAlreadyExistsException if the contact to add already exists in the list
-     * @param Contact contact the contact to add
-     * @return boolean this function always returns true
-     */
-    @Override
-    public boolean add(Contact contact) {
-        if( this.contains(contact) ) {
-            throw new ContactAlreadyExistsException("The contact " + contact + "already exists in the list");
-        }
-        
-        super.add(contact);
-        
-        return true;
     }
 }
