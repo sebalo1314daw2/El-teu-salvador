@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class Contact {
     // ================================ Attributes =====================================================
+    private int id;
     private String name;
     private List<Phone> phoneList;
     private Photo photo;
@@ -25,7 +26,16 @@ public class Contact {
         this.phoneList = phoneList;
         this.photo = photo;
     }
+
     // ================================ Accessors =====================================================
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -48,12 +58,12 @@ public class Contact {
 
     public void setPhoto(Photo photo) {
         this.photo = photo;
-    }
+    }    
 
     // ================================ Methods =====================================================
     @Override
     public String toString() {
-        return "Contact{" + "name=" + name + ", phoneList=" + phoneList + ", photo=" + photo + "}\n";
+        return "Contact{" + "id=" + id + ", name=" + name + ", phoneList=" + phoneList + ", photo=" + photo + '}' + "\n";
     }
     /**
      * validate()
@@ -86,10 +96,9 @@ public class Contact {
             return false;
         }
         final Contact other = (Contact) obj;
-        if (!Objects.equals(this.name, other.name)) {
+        if (this.id != other.id) {
             return false;
         }
         return true;
     }
-    
 }

@@ -61,4 +61,20 @@ public class ContactList extends ArrayList<Contact> {
             this.remove( contactList.get(i) );
         }
     }
+    /**
+     * add()
+     * This function adds the specified contact to the list
+     * @author Sergio Baena Lopez
+     * @version 6.1
+     * @param Contact contact the contact to add
+     * @return boolean this function always returns true
+     */
+    @Override
+    public boolean add(Contact contact) {
+        contact.setId( this.size() );
+        
+        super.add(contact);
+        
+        return true;
+    }
 }

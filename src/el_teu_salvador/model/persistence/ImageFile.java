@@ -42,7 +42,7 @@ public class ImageFile {
                 // Now, we create and write a binary file
                 DataOutputStream file = new DataOutputStream (
                     new FileOutputStream ( 
-                        CONTAINER_DIRECTORY_PATH + aContact.getName() + "." + aPhoto.getType()
+                        CONTAINER_DIRECTORY_PATH + aContact.getId() + "." + aPhoto.getType()
                     ) 
                 );
                 file.write(binaryContent, 0, binaryContent.length); 
@@ -83,7 +83,7 @@ public class ImageFile {
          DataInputStream file = new DataInputStream (
             new FileInputStream ( 
                 CONTAINER_DIRECTORY_PATH                +
-                contact.getName()                       +
+                contact.getId()                         +
                 "."                                     + 
                 contact.getPhoto().obtainExtension()
             ) 
@@ -147,11 +147,11 @@ public class ImageFile {
     private static void copyToRightDirectory(Contact contact) throws IOException {
         if( !isDefaultImage(contact) ) {
             File source = contact.getPhoto().getSource();
-            String nameContact = contact.getName();
+            int idContact = contact.getId();
             String extension = contact.getPhoto().obtainExtension();
 
             Path from = Paths.get( source.getPath() );
-            Path to = Paths.get(CONTAINER_DIRECTORY_PATH + nameContact + "." + extension);
+            Path to = Paths.get(CONTAINER_DIRECTORY_PATH + idContact + "." + extension);
             CopyOption [] options = {StandardCopyOption.REPLACE_EXISTING};
 
             Files.copy(from, to, options);
