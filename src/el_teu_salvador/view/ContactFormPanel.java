@@ -41,18 +41,21 @@ public class ContactFormPanel extends JPanel {
     private List<JComboBox> selectList;
     private List<JTextField> textboxList;
     private Map<String, List<Object>> fieldsInfo;
+    private Contact oldContact;
     
     public static final String NO_PHOTO_MSG = "Has de seleccionar una foto.";
     public static final String WRONG_DIMENSION_MSG = "La foto ha de ser 96x96.";
     public static final String SUCCESSFUL_ADDITION_MSG = "S'ha afegit el contacte satisfactòriament";
+    public static final String SUCCESSFUL_EDITION_MSG = "S'ha editat el contacte satisfactòriament";
     // ================================ Constructors =====================================================
-    public ContactFormPanel(Controller controller, MainView parent, Contact contact) {
+    public ContactFormPanel(Controller controller, MainView parent, Contact oldContact) {
         this.controller = controller;
         this.parent = parent;
+        this.oldContact = oldContact;
         selectList = new ArrayList<JComboBox>();
         textboxList = new ArrayList<JTextField>();
         fieldsInfo = new HashMap<String, List<Object>>();
-        initComponents(contact);
+        initComponents();
         initFieldsInfo();
     }
     // ================================ Methods =====================================================
@@ -60,10 +63,9 @@ public class ContactFormPanel extends JPanel {
      * initComponents()
      * This procedure initializes all the components of the contact's form
      * @author Sergio Baena Lopez
-     * @version 5.0
-     * @param Contact contact the contact to modify or null (if the form is a register)
+     * @version 6.2
      */
-    private void initComponents(Contact contact) {
+    private void initComponents() {
         // Setting the layout 
         this.setLayout( new BoxLayout(this, BoxLayout.Y_AXIS) );
         // Creating the container of the title
@@ -74,18 +76,17 @@ public class ContactFormPanel extends JPanel {
         titleContainer.setBackground( new Color(199, 199, 193) );
         this.add(titleContainer);
         // Creating the container of the group of buttons
-        generateButtonGroup(contact);
+        generateButtonGroup();
         // Creating the form
-        generateForm(contact);
+        generateForm();
     }
     /**
      * generateButtonGroup()
      * This procedure generates the button group of the form
      * @author Sergio Baena Lopez
-     * @version 5.5
-     * @param Contact contact the contact to modify or null (if the form is a register)
+     * @version 6.2
      */
-    private void generateButtonGroup(Contact contact) {
+    private void generateButtonGroup() {
         JPanel buttonGroupContainer = new JPanel();
         buttonGroupContainer.setLayout( new FlowLayout(FlowLayout.CENTER) );
         JButton addPhoneButton = new JButton("Afegir telèfon");
@@ -97,13 +98,16 @@ public class ContactFormPanel extends JPanel {
             controller.removePhoneField();
         }});
         JButton confirmButton;
-        if(contact == null) { // the form is a register
+        if(oldContact == null) { // the form is a register
             confirmButton = new JButton("Afegir");
             confirmButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
                 controller.addContact();
             }});
         } else {
             confirmButton = new JButton("Editar");
+            confirmButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
+                controller.editContact();
+            }});
         }
         JButton cancelButton = new JButton("Cancel·lar");
         cancelButton.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent ae) {
@@ -120,19 +124,18 @@ public class ContactFormPanel extends JPanel {
      * generateForm()
      * This procedure generates the form
      * @author Sergio Baena Lopez
-     * @version 5.0
-     * @param Contact contact the contact to modify or null (if the form is a register)
+     * @version 6.2
      */
-    private void generateForm(Contact contact) {
+    private void generateForm() {
         form = new JPanel();
         form.setLayout( new GridLayout(0, 2) );
         JLabel changePhoto = new JLabel("Canviar foto");
         form.add(changePhoto);
         
-        if(contact == null) { // the form is a register
+        if(oldContact == null) { // the form is a register
             generateRegisterForm();
         } else {
-            generateEditionForm(contact);
+            generateEditionForm();
         }
         
         JScrollPane scrollForm = new JScrollPane(form);
@@ -170,12 +173,12 @@ public class ContactFormPanel extends JPanel {
      * generateEditionForm()
      * This procedure generates the form of edition
      * @author Sergio Baena Lopez
-     * @version 5.4
-     * @param Contact contact the contact to modify
+     * @version 6.2
      */
-    private void generateEditionForm(Contact contact) {
-        Photo photo = contact.getPhoto();
-        String name = contact.getName();
+    private void generateEditionForm() {
+        Photo photo = oldContact.getPhoto();
+        int id = oldContact.getId();
+        String name = oldContact.getName();
         File source;
         
         if(photo == null) { // the contact hasn't photo
@@ -184,13 +187,18 @@ public class ContactFormPanel extends JPanel {
         } else { // the contact has photo
             source = new File (
                 ImageFile.CONTAINER_DIRECTORY_PATH  + 
-                name                                +
+                id                                  +
                 "."                                 + 
                 photo.getType()
             );
         }
         photo.setSource(source);
         imageComponent = new ImageComponent(photo);
+        imageComponent.setCursor( new Cursor(Cursor.HAND_CURSOR) );
+        imageComponent.setToolTipText("Fes clic per canviar la foto");
+        imageComponent.addMouseListener(new MouseAdapter(){public void mouseClicked(MouseEvent me) {
+             controller.selectNewPhoto();
+        }});
         form.add(imageComponent);
         // Name field 
         JLabel nameLabel = new JLabel("Nom");
@@ -199,7 +207,7 @@ public class ContactFormPanel extends JPanel {
         form.add(nameLabel);
         form.add(nameTextbox);
         // Phones fields
-        List<Phone> phoneList = contact.getPhoneList();
+        List<Phone> phoneList = oldContact.getPhoneList();
         for(int i = 0; i < phoneList.size(); i++) {
             Phone aPhone = phoneList.get(i);
             // Phone field
@@ -208,6 +216,12 @@ public class ContactFormPanel extends JPanel {
             
             selectList.add(aSelect);
             textboxList.add(aTextbox);
+            
+            int index = textboxList.size() - 1;
+            List<Object> valueAPhone = new ArrayList<Object>();
+            valueAPhone.add("El telèfon " + (index + 1) + " no és vàlid.");
+            valueAPhone.add(aTextbox);
+            fieldsInfo.put(Phone.NUMBER_ATTR_OF_PHONE + index, valueAPhone);
             
             form.add(aSelect);
             form.add(aTextbox);
@@ -293,7 +307,7 @@ public class ContactFormPanel extends JPanel {
       * read()
       * This function reads the form
       * @author Sergio Baena Lopez
-      * @version 5.5
+      * @version 6.2
       * @return Contact the read contact
       */
      public Contact read() {
@@ -309,7 +323,14 @@ public class ContactFormPanel extends JPanel {
          
          Photo photo = imageComponent.getPhoto();
          
-         return new Contact(name, phoneList, photo);
+         Contact contact = null;
+         if(oldContact == null) {
+             contact = new Contact(name, phoneList, photo);
+         } else {
+             contact = new Contact(oldContact.getId(), name, phoneList, photo);
+         }
+         
+         return contact;
      }
      /**
       * selectPhoto()

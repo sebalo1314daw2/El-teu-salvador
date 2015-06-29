@@ -72,7 +72,7 @@ public class ImageFile {
      * obtainBinaryContent()
      * This function obtains the binary content from the specified contact
      * @author Sergio Baena Lopez
-     * @version 5.5
+     * @version 6.2
      * @param Contact contact the contact whose binary content we want to obtain
      * @return ByteList the binary content
      */
@@ -85,7 +85,7 @@ public class ImageFile {
                 CONTAINER_DIRECTORY_PATH                +
                 contact.getId()                         +
                 "."                                     + 
-                contact.getPhoto().obtainExtension()
+                contact.getPhoto().obtainType()
             ) 
          );
 //         file.read(binaryContent);
@@ -141,17 +141,18 @@ public class ImageFile {
      * copyToRightDirectory()
      * This procedure copies the image file to its right directory
      * @author Sergio Baena Lopez
-     * @version 5.5
+     * @version 6.2
      * @param Contact contact the contact who has all the information about the image to copy
      */
     private static void copyToRightDirectory(Contact contact) throws IOException {
         if( !isDefaultImage(contact) ) {
             File source = contact.getPhoto().getSource();
             int idContact = contact.getId();
-            String extension = contact.getPhoto().obtainExtension();
+            Photo photo = contact.getPhoto();
+            String type = photo.obtainType();
 
             Path from = Paths.get( source.getPath() );
-            Path to = Paths.get(CONTAINER_DIRECTORY_PATH + idContact + "." + extension);
+            Path to = Paths.get(CONTAINER_DIRECTORY_PATH + idContact + "." + type);
             CopyOption [] options = {StandardCopyOption.REPLACE_EXISTING};
 
             Files.copy(from, to, options);

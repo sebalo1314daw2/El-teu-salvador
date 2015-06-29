@@ -62,19 +62,14 @@ public class ContactList extends ArrayList<Contact> {
         }
     }
     /**
-     * add()
-     * This function adds the specified contact to the list
+     * set()
+     * This procedure modifies the specified contact of the list
      * @author Sergio Baena Lopez
-     * @version 6.1
-     * @param Contact contact the contact to add
-     * @return boolean this function always returns true
+     * @version 6.2
+     * @param Contact contact the contact to modify
      */
-    @Override
-    public boolean add(Contact contact) {
-        contact.setId( this.size() );
-        
-        super.add(contact);
-        
-        return true;
+    public void set(Contact contact) {
+        int index = this.indexOf(contact);
+        this.set(index, contact);
     }
 }

@@ -307,4 +307,34 @@ public class Controller {
                 break;
         }
     }
+    /**
+     * editContact()
+     * This procedure edits the read contact from the form
+     * @author Sergio Baena Lopez
+     * @version 6.2
+     */
+    public void editContact() {
+        try {
+            Contact contact = contactFormPanel.read();
+            List<String> invalidAttrList = contact.validate();
+            contactFormPanel.clearErrors();
+            if( invalidAttrList.isEmpty() ) { // the contact is valid
+                totalContactList.set(contact); 
+                partialContactList.set(contact);
+
+                ImageFile.generate(contact);
+                
+                mainView.showSuccessMsg(ContactFormPanel.SUCCESSFUL_EDITION_MSG);
+
+                updateContactTable();
+
+                changeView(contactAdminPanel);
+                contactFormPanel = null;
+            } else { // the contact is invalid
+                contactFormPanel.showErrors(invalidAttrList);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

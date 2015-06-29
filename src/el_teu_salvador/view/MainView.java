@@ -169,7 +169,7 @@ public class MainView extends JFrame {
      * obtainImageComponent()
      * This function obtains the image component from the specified contact
      * @author Sergio Baena Lopez
-     * @version 5.4
+     * @version 6.2
      * @throws FileNotFoundException if the image file wasn't found
      * @param Contact contact the contact whose image component we want to obtain
      * @return ImageComponent the image component
@@ -186,7 +186,7 @@ public class MainView extends JFrame {
             photo = new Photo ( 
                 new File (
                     ImageFile.CONTAINER_DIRECTORY_PATH  +
-                    contact.getName()                   +
+                    contact.getId()                     +
                     "."                                 + 
                     contact.getPhoto().getType()
                 )

@@ -11,22 +11,33 @@ public class Contact {
     private List<Phone> phoneList;
     private Photo photo;
     
+    private static int nextId;
+    
     public static final String NAME_ATTR_OF_CONTACT = "name";
     // ================================ Constructors =====================================================
     public Contact() {
         phoneList = new ArrayList<Phone>();
+        generateId();
     }
 
     public Contact(String name) {
         this.name = name;
+        generateId();
     }
 
     public Contact(String name, List<Phone> phoneList, Photo photo) {
         this.name = name;
         this.phoneList = phoneList;
         this.photo = photo;
+        generateId();
     }
 
+    public Contact(int id, String name, List<Phone> phoneList, Photo photo) {
+        this.id = id;
+        this.name = name;
+        this.phoneList = phoneList;
+        this.photo = photo;
+    }
     // ================================ Accessors =====================================================
     public int getId() {
         return id;
@@ -100,5 +111,15 @@ public class Contact {
             return false;
         }
         return true;
+    }
+    /**
+     * generateId()
+     * This procedure generates the id of this contact
+     * @author Sergio Baena Lopez
+     * @version 6.2
+     */
+    private void generateId() {
+        id = nextId;
+        nextId++; 
     }
 }
