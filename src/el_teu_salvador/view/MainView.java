@@ -8,6 +8,8 @@ import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import javax.swing.JFileChooser;
@@ -32,12 +34,15 @@ public class MainView extends JFrame {
      * initComponents()
      * This procedure initializes all the components of the main view
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 7.0
      */
     private void initComponents() {
         this.setTitle("El teu salvador");
         
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {public void windowClosing(WindowEvent we) {
+            controller.exit();
+        }});
         this.setSize(400, 200);
         
         JMenuBar menuBar = buildMainMenu();

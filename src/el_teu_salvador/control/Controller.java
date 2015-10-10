@@ -10,6 +10,7 @@ import el_teu_salvador.model.exceptions.PhotoNotSelectedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
+import el_teu_salvador.model.persistence.XML;
 import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 public class Controller {
     // ================================ Attributes =====================================================
@@ -30,6 +33,7 @@ public class Controller {
     // ================================ Constructors =====================================================
     public Controller() {
         initViews();
+        totalContactList = new ContactList();
         selectedContactList = new ContactList();
     }
     // ================================ Methods =====================================================
@@ -333,6 +337,20 @@ public class Controller {
             } else { // the contact is invalid
                 contactFormPanel.showErrors(invalidAttrList);
             }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * exit()
+     * This procedure exits the application
+     * @author Sergio Baena Lopez
+     * @version 7.0
+     */
+    public void exit() {
+        try {
+            XML.generate(totalContactList);
+            System.exit(0);
         } catch(Exception e) {
             e.printStackTrace();
         }
