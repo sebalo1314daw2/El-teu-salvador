@@ -5,10 +5,13 @@ import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.Photo;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -21,8 +24,12 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 
-public class XML {
+public class XML extends DefaultHandler {
     // ================================ Attributes =====================================================
     private static final String CONTAINER_DIRECTORY_PATH = "xml/";
     private static final String PATH = "contact-list.xml";
@@ -39,6 +46,13 @@ public class XML {
     private static final String PHOTO_TAG = "photo";
     private static final String ENCODING_TAG = "encoding";
     private static final String CONTENT_TAG = "content";
+    
+    private ContactList contactList;
+    private String readText;
+    private Contact aContact;
+    private Phone aPhone;
+    private Photo aPhoto;
+    private boolean readingPhoneList;
     // ================================ Static methods =====================================================
     /**
      * generate()
@@ -160,5 +174,98 @@ public class XML {
         photoTag.appendChild(contentTag);
 
         return photoTag;
+    }
+    /**
+     * read()
+     * This function reads the XML document
+     * @author Sergio Baena Lopez
+     * @version 7.1
+     * @return ContactList the read list of contacts
+     */
+    public static ContactList read() throws ParserConfigurationException, SAXException, IOException {
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        saxParserFactory.setValidating(false);
+        SAXParser saxParser = saxParserFactory.newSAXParser();
+        XMLReader xmlReader = saxParser.getXMLReader();
+        XML xml = new XML();
+        xmlReader.setContentHandler(xml);
+        xmlReader.parse(CONTAINER_DIRECTORY_PATH + PATH);
+        return xml.contactList;
+    }
+    /**
+     * characters()
+     * This procedure stores the read text in the readText attribute.
+     * @author Sergio Baena Lopez
+     * @version 7.1
+     */
+    @Override 
+    public void characters(char[] buffer, int start, int length) {
+        readText = new String(buffer, start, length);
+    }
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) {
+        switch(qName) {
+            case CONTACT_LIST_TAG:
+                contactList = new ContactList();
+                break;
+            case CONTACT_TAG:
+                aContact = new Contact();
+                break;
+            case PHONE_LIST_TAG:
+                readingPhoneList = true;
+                break;
+            case PHONE_TAG:
+                aPhone = new Phone();
+                break;  
+            case PHOTO_TAG:
+                aPhoto = new Photo();
+                break;  
+        }        
+    }
+    @Override
+    public void endElement(String uri, String localName, String qName) {
+        switch(qName) {
+            case NAME_TAG:
+                aContact.setName(readText);
+                break;
+            case TYPE_TAG:
+                if(readingPhoneList) { // type is attribute of phone object
+                    aPhone.setType( Integer.parseInt(readText) );
+                } else {
+                    aPhoto.setType(readText);
+                }
+                break;
+            case NUMBER_TAG:
+                aPhone.setNumber(readText);
+                break;
+            case PHONE_TAG:
+                aContact.getPhoneList().add(aPhone);
+                break;
+            case PHONE_LIST_TAG:
+                readingPhoneList = false;
+                break;
+            case ENCODING_TAG:
+                aPhoto.setEncoding(readText);
+                break;
+            case CONTENT_TAG:
+                aPhoto.setContent(readText);
+                break;
+            case PHOTO_TAG:
+                aContact.setPhoto(aPhoto);
+                break;
+            case CONTACT_TAG:
+                contactList.add(aContact);
+                break;   
+        }
+    }
+    /**
+     * exists()
+     * This function indicates if the XML document exists or not
+     * @author Sergio Baena Lopez
+     * @version 7.1
+     * @return boolean if the XML document exists or not
+     */
+    public static boolean exists() {
+        return new File(CONTAINER_DIRECTORY_PATH + PATH).exists();
     }
 }

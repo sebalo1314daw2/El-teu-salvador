@@ -20,6 +20,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import org.xml.sax.SAXException;
 
 public class Controller {
     // ================================ Attributes =====================================================
@@ -32,9 +33,7 @@ public class Controller {
     private ContactList selectedContactList;
     // ================================ Constructors =====================================================
     public Controller() {
-        initViews();
-        totalContactList = new ContactList();
-        selectedContactList = new ContactList();
+        initApp();
     }
     // ================================ Methods =====================================================
     /**
@@ -50,7 +49,7 @@ public class Controller {
      * importContacts()
      * This procedure imports all the contacts from a VCF file
      * @author Sergio Baena Lopez
-     * @version 5.3
+     * @version 7.1
      */
     public void importContacts() {
 //        http://www.forosdelweb.com/f45/netbeans-java-convertir-string-imagen-898488/
@@ -59,10 +58,7 @@ public class Controller {
             VCF vcf = mainView.selectVCF();
             if( vcf.validate() ) { // VCF is valid --> We read the VCF file
                 totalContactList = vcf.read();
-                partialContactList = new ContactList(totalContactList); 
-                ImageFile.generate(totalContactList);
-                contactAdminPanel = new ContactAdminPanel(this, partialContactList);
-                changeView(contactAdminPanel);
+                loadContacts();
             } else { // VCF isn't valid --> we show an error message
                 mainView.showErrorMsg(MainView.INVALID_VCF_MSG);
             }
@@ -354,5 +350,37 @@ public class Controller {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    /**
+     * initApp()
+     * This procedure initializes the application
+     * @author Sergio Baena Lopez
+     * @version 7.1
+     */
+    private void initApp() {
+        try {
+            initViews();
+
+            if( XML.exists() ) {
+                totalContactList = XML.read();
+                loadContacts();
+            } 
+            
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * loadContacts()
+     * This procedure loads all the contacts
+     * @author Sergio Baena Lopez
+     * @version 7.1
+     */
+    private void loadContacts() throws IOException {
+        partialContactList = new ContactList(totalContactList); 
+        selectedContactList = new ContactList();
+        ImageFile.generate(totalContactList);
+        contactAdminPanel = new ContactAdminPanel(this, partialContactList);
+        changeView(contactAdminPanel);
     }
 }

@@ -173,7 +173,7 @@ public class ImageFile {
             photo.setType( photo.obtainType() );
 
             ByteList binaryContent = obtainBinaryContent(contact);
-            String stringContent = obtainStringContentFromBase64(binaryContent);
+            String stringContent = obtainStringContentFromBase64(binaryContent).replaceAll("[\n]", "");
             photo.setContent(stringContent);
         } else {
             contact.setPhoto(null);
