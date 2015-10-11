@@ -54,7 +54,7 @@ public class MainView extends JFrame {
      * buildMainMenu()
      * This procedure builds the main menu of the application
      * @author Sergio Baena Lopez
-     * @version 1.0
+     * @version 8
      * @return JMenuBar the main menu of the application 
      */
     private JMenuBar buildMainMenu() {
@@ -74,6 +74,9 @@ public class MainView extends JFrame {
         menu.add(menuItem);
         
         menuItem = new JMenuItem("Sortir");
+        menuItem.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { 
+            controller.exit();
+        }});
         menu.add(menuItem);
         
         menuBar.add(menu);
