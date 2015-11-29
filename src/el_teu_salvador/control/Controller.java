@@ -344,11 +344,13 @@ public class Controller {
      * exit()
      * This procedure exits the application
      * @author Sergio Baena Lopez
-     * @version 7.0
+     * @version 10.0
      */
     public void exit() {
         try {
-            XML.generate(totalContactList);
+            if(totalContactList != null) {
+                XML.generate(totalContactList);
+            }
             System.exit(0);
         } catch(Exception e) {
             e.printStackTrace();
