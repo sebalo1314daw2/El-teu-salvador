@@ -3,6 +3,7 @@ package el_teu_salvador.view;
 import el_teu_salvador.control.Controller;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.Photo;
+import el_teu_salvador.model.exceptions.DirectoryNotSelectedException;
 import el_teu_salvador.model.exceptions.VCFNotSelectedException;
 import el_teu_salvador.model.persistence.ImageFile;
 import el_teu_salvador.model.persistence.VCF;
@@ -23,7 +24,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class MainView extends JFrame {
     // =============================== Attributes ======================================================
     private Controller controller;
+    
     public static final String INVALID_VCF_MSG = "L'arxiu seleccionat no és del tipus VCF";
+    public static final String DIRECTORY_NOT_EXISTED_MSG = "La carpeta seleccionada no existeix";
+    public static final String DIRECTORY_NO_EDITABLE_MSG = "Accés denegat a la carpeta";
+    
+    public static final String SUCCESSFUL_EXPORTATION_MSG = "S'ha exportat tots els contactes satisfactòriament";
     // ================================ Constructors =====================================================
     public MainView(Controller controller) {
         initComponents();
@@ -54,7 +60,7 @@ public class MainView extends JFrame {
      * buildMainMenu()
      * This procedure builds the main menu of the application
      * @author Sergio Baena Lopez
-     * @version 8
+     * @version 9.0
      * @return JMenuBar the main menu of the application 
      */
     private JMenuBar buildMainMenu() {
@@ -71,6 +77,9 @@ public class MainView extends JFrame {
         menu.add(menuItem);
         
         menuItem = new JMenuItem("Exportar contactes");
+        menuItem.addActionListener(new ActionListener() {public void actionPerformed(ActionEvent event) { 
+            controller.exportContacts();
+        }});
         menu.add(menuItem);
         
         menuItem = new JMenuItem("Sortir");
@@ -205,5 +214,22 @@ public class MainView extends JFrame {
             throw new FileNotFoundException("The file image " + source + " wasn't found");
         } // The file image was found
         return new ImageComponent(photo);
+    }
+    /**
+     * selectDirectory()
+     * This function shows the file explorer and then the user selects a directory
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @return File the selected directory
+     * @throws DirectoryNotSelectedException if the user didn't selected any directory
+     */
+    public File selectDirectory() throws DirectoryNotSelectedException {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int selection = fileChooser.showDialog(this, "Exportar contactes");
+        if(selection != JFileChooser.APPROVE_OPTION) {
+            throw new DirectoryNotSelectedException("The user doesn't select any directory");
+        }
+        return fileChooser.getSelectedFile();
     }
 }

@@ -3,7 +3,9 @@ package el_teu_salvador.control;
 import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Photo;
+import el_teu_salvador.model.Utilities;
 import el_teu_salvador.model.exceptions.ContactNotFoundException;
+import el_teu_salvador.model.exceptions.DirectoryNotSelectedException;
 import el_teu_salvador.model.exceptions.NoContactSpecifiedException;
 import el_teu_salvador.model.exceptions.PhoneFieldNotFoundException;
 import el_teu_salvador.model.exceptions.PhotoNotSelectedException;
@@ -14,6 +16,7 @@ import el_teu_salvador.model.persistence.XML;
 import el_teu_salvador.view.ContactAdminPanel;
 import el_teu_salvador.view.ContactFormPanel;
 import el_teu_salvador.view.MainView;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.JCheckBox;
@@ -382,5 +385,32 @@ public class Controller {
         ImageFile.generate(totalContactList);
         contactAdminPanel = new ContactAdminPanel(this, partialContactList);
         changeView(contactAdminPanel);
+    }
+    /**
+     * exportContacts()
+     * This procedure exports the contacts
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     */
+    public void exportContacts() {
+        try {
+            File selectedDirectory = mainView.selectDirectory();
+            switch( Utilities.validateDirectory(selectedDirectory) ) {
+                case Utilities.OK:
+                    VCF.generate2_1(totalContactList, selectedDirectory);
+                    mainView.showSuccessMsg(MainView.SUCCESSFUL_EXPORTATION_MSG);
+                    break;
+                case Utilities.NOT_EXISTED:
+                    mainView.showErrorMsg(MainView.DIRECTORY_NOT_EXISTED_MSG);
+                    break;
+                case Utilities.CANNOT_WRITE:
+                    mainView.showErrorMsg(MainView.DIRECTORY_NO_EDITABLE_MSG);
+                    break;
+            }
+        } catch(DirectoryNotSelectedException e) {
+            // We do nothing
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

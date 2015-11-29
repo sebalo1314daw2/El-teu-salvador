@@ -4,13 +4,15 @@ import el_teu_salvador.model.Contact;
 import el_teu_salvador.model.ContactList;
 import el_teu_salvador.model.Phone;
 import el_teu_salvador.model.Photo;
+import el_teu_salvador.model.Utilities;
 import el_teu_salvador.model.exceptions.VCFCorruptedException;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,6 +25,7 @@ public class VCF {
     private static final String BEGINNING = "BEGIN:VCARD";
     private static final String VERSION_KEY = "VERSION";
     private static final String [] AVALIABLE_VERSIONS_LIST = {"2.1", "3.0", "4.0"};
+    private static final String NAME_WITHOUT_FORMAT_KEY = "N"; 
     private static final String NAME_KEY = "FN";
     private static final String PHONE_KEY = "TEL";
     private static final String PHOTO_KEY = "PHOTO";
@@ -35,6 +38,8 @@ public class VCF {
     private static final String SECONDARY_DELIMETER = ";";
     private static final String TERTIARY_DELIMETER = "=";
     
+    private static final String DEFAULT_FILENAME = "Els-teus-contactes.vcf";
+    private static final int MAX_CHARS_IN_PHOTO_LINE = 74;
     // ================================ Constructors =====================================================
     public VCF(File source) {
         this.source = source;
@@ -272,5 +277,213 @@ public class VCF {
      */
     private ContactList read4_0() {
         return null; // TODO
+    }
+    /**
+     * generate2_1()
+     * This procedure generates an VCF file with the specified contacts in the specified directory (version 2.1)
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @param ContactList contactList the contacts who will be written in VCF file
+     * @param File directory the directory where we'll generate the VCF file
+     */
+    public static void generate2_1(ContactList contactList, File directory) throws IOException {
+        BufferedWriter file = new BufferedWriter( new FileWriter( new File(directory, DEFAULT_FILENAME) ) );
+        
+        for(int i = 0; i < contactList.size(); i++) { // A contact
+            Contact contact = contactList.get(i);
+            // Beginning
+            file.write(BEGINNING);
+            file.newLine();
+            // Version
+            file.write(VERSION_KEY + PRIMARY_DELIMETER + AVALIABLE_VERSIONS_LIST[0]);
+            file.newLine();
+            // Contact's name 
+            if(contact.getName() != null) {
+                file.write( NAME_WITHOUT_FORMAT_KEY + PRIMARY_DELIMETER + obtainNameWithoutFormat(contact) );
+                file.newLine();
+                file.write( NAME_KEY + PRIMARY_DELIMETER + contact.getName() );
+                file.newLine();
+            }
+            // List of phones of contact
+            List<Phone> phoneList = contact.getPhoneList();
+            for(int j = 0; j < phoneList.size(); j++) { // A phone
+                Phone phone = phoneList.get(j);
+                String aLine = PHONE_KEY + SECONDARY_DELIMETER;
+                switch( phone.getType() ) {
+                    case Phone.MOBILE:
+                        aLine += MOBILE;
+                        break;
+                    case Phone.LANDLINE:
+                        aLine += LANDLINE;
+                        break;
+                }
+                aLine += PRIMARY_DELIMETER + phone.getNumber();
+                file.write(aLine);
+                file.newLine();
+            }
+            // Contact's photo
+            Photo photo = contact.getPhoto();
+            if(photo != null) {
+                String someLine = 
+                    PHOTO_KEY + 
+                    SECONDARY_DELIMETER + 
+                    ENCODING + 
+                    TERTIARY_DELIMETER +
+                    photo.getEncoding() +
+                    SECONDARY_DELIMETER +
+                    photo.getType() +
+                    PRIMARY_DELIMETER;
+                int initiationIndexFirstLine = someLine.length();
+                someLine += tabPhotoContent(photo, initiationIndexFirstLine);
+                file.write(someLine);
+                file.newLine();
+            }
+            // End
+            file.write(END_KEY + PRIMARY_DELIMETER + VCARD);
+            file.newLine();
+        } // We've already written all the contacts
+        file.close();
+    }
+    /**
+     * obtainNameWithoutFormat()
+     * This function obtains the name without format from the specified contact
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @param Contact contact the contact where we'll obtain the name without format from.
+     * @return String the name without format
+     */
+    private static String obtainNameWithoutFormat(Contact contact) {
+        String nameWithoutFormat;
+        String nameWithFormat = Utilities.removeDoubleSpaces( contact.getName() );
+        StringTokenizer nameWithFormatTokenizer = new StringTokenizer(nameWithFormat, " ");
+        switch( nameWithFormatTokenizer.countTokens() ) {
+            case 1:
+                nameWithoutFormat = obtainNameWithoutFormat( nameWithFormatTokenizer.nextToken() );
+                break;
+            case 2:
+                nameWithoutFormat = obtainNameWithoutFormat ( 
+                    nameWithFormatTokenizer.nextToken(), 
+                    nameWithFormatTokenizer.nextToken() 
+                );
+                break;
+            case 3:
+                nameWithoutFormat = obtainNameWithoutFormat ( 
+                        nameWithFormatTokenizer.nextToken(), 
+                        nameWithFormatTokenizer.nextToken(),
+                        nameWithFormatTokenizer.nextToken() 
+                );
+                break;
+            default:
+                List<String> wordList = Utilities.obtainTokenList(nameWithFormatTokenizer);
+                nameWithoutFormat = obtainNameWithoutFormat(wordList);
+                break;
+        }
+        return nameWithoutFormat;
+    }
+    /**
+     * obtainNameWithoutFormat()
+     * This function obtains the name without format from the specified three words
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @param String word1 the first word
+     * @param String word2 the second word
+     * @param String word3 the third word
+     * @return String the name without format
+     */
+    private static String obtainNameWithoutFormat(String word1, String word2, String word3) {
+        return  word3                   + 
+                SECONDARY_DELIMETER     +
+                word1                   + 
+                SECONDARY_DELIMETER     + 
+                word2                   + 
+                SECONDARY_DELIMETER     + 
+                SECONDARY_DELIMETER;
+    }
+    /**
+     * obtainNameWithoutFormat()
+     * This function obtains the name without format from the specified word
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @param String word the word
+     * @return String the name without format
+     */
+    private static String obtainNameWithoutFormat(String word) {
+        return obtainNameWithoutFormat(word, "", "");
+    }
+   /**
+    * obtainNameWithoutFormat()
+    * This function obtains the name without format from the specified two words
+    * @author Sergio Baena Lopez
+    * @version 9.0
+    * @param String word1 the first word
+    * @param String word2 the second word
+    * @return String the name without format
+    */
+    private static String obtainNameWithoutFormat(String word1, String word2) {
+         return obtainNameWithoutFormat(word1, "", word2);
+    }
+   /**
+    * obtainNameWithoutFormat()
+    * This function obtains the name without format from the specified four words or more (it's contained in
+    * a list)
+    * @author Sergio Baena Lopez
+    * @version 9.0
+    * @param List<String> wordList the list of words where we obtain the name without format from
+    * @return String the name without format
+    */
+    private static String obtainNameWithoutFormat(List<String> wordList) {
+        String word1 = "";
+        int numWordsToConcatenate = wordList.size() - 2;
+        for(int i = 0; i < numWordsToConcatenate; i++) {
+            word1 += wordList.get(i) + " ";
+        }
+        word1 = word1.trim();
+        
+        int nextToLastIndex = wordList.size() - 2;
+        int lastIndex = wordList.size() - 1;
+
+        String word2 = wordList.get(nextToLastIndex);
+        String word3 = wordList.get(lastIndex);
+        
+        return obtainNameWithoutFormat(word1, word2, word3);
+    }
+    /**
+     * tabPhotoContent()
+     * This function tabulates the content of the specified photo. It's necessary for its persistence in VCF.
+     * @author Sergio Baena Lopez
+     * @version 9.0
+     * @param Photo photo the photo which content we want to tabulate
+     * @param int initiationIndexFirstLine the initiation's index of the first line of the content of the photo
+     * @return String the tabulated content of the photo
+     */
+    private static String tabPhotoContent(Photo photo, int initiationIndexFirstLine) {
+        StringBuilder tabulatedContentBuilder = new StringBuilder();
+        String content = photo.getContent();
+        int contentLength = content.length();
+        // Getting first line
+        int j = MAX_CHARS_IN_PHOTO_LINE - initiationIndexFirstLine; // exclusive
+        tabulatedContentBuilder.append( content.substring(0, j) );
+        tabulatedContentBuilder.append("\n");
+        // Getting another lines
+        int i = j;
+        j = i + MAX_CHARS_IN_PHOTO_LINE - 1;
+        
+        while(j <= contentLength) {
+            tabulatedContentBuilder.append(" ");
+            tabulatedContentBuilder.append( content.substring(i, j) );
+            tabulatedContentBuilder.append("\n");
+            
+            i = j;
+            j = i + MAX_CHARS_IN_PHOTO_LINE - 1;
+        }
+        
+        if(i != contentLength) { // "i" doesn't point to a position more which the last character has 
+            // There's something yet. It's a line which isn't completed
+            tabulatedContentBuilder.append(" ");
+            tabulatedContentBuilder.append( content.substring(i) );
+            tabulatedContentBuilder.append("\n");
+        }
+        
+        return tabulatedContentBuilder.toString();
     }
 }
